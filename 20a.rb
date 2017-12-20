@@ -46,12 +46,18 @@ class Particle
     end
   end
 
+  def acceleration
+    @ax.abs + @ay.abs + @az.abs
+  end
+
   def <=>(other)
-    if (self.distance <=> other.distance) == 0
-      self.delta_distance <=> other.delta_distance
-    else
-      self.distance <=> other.distance
-    end
+    #if (self.delta_distance <=> other.delta_distance) == 0
+    #  self.distance <=> other.distance
+    #else
+    #  self.delta_distance <=> other.delta_distance
+    #end
+
+    self.acceleration <=> other.acceleration
   end
 end
 
@@ -66,10 +72,12 @@ input.each_with_index do |row, i|
   particles << Particle.new(i, row)
 end
 
-100.times do
-  particles.each(&:tick)
-  particles = particles.sort
-end
+particles = particles.sort
+
+#100_000_000.times do
+#  particles.each(&:tick)
+#  particles = particles.sort
+#end
 
 
-puts particles[0..5].inspect
+puts particles[0].inspect
