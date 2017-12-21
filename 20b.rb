@@ -1,5 +1,5 @@
 class Particle
-  attr_reader :distance, :delta_distance
+  attr_reader :id, :distance, :delta_distance
 
   def initialize(id, args)
     @id = id
@@ -50,14 +50,18 @@ class Particle
     @ax.abs + @ay.abs + @az.abs
   end
 
-  def <=>(other)
-    if (self.delta_distance <=> other.delta_distance) == 0
-      self.distance <=> other.distance
-    else
-      self.delta_distance <=> other.delta_distance
-    end
+  def position
+    [@px, @py, @pz].join(',')
+  end
 
-    #self.acceleration <=> other.acceleration
+  def <=>(other)
+    #if (self.delta_distance <=> other.delta_distance) == 0
+    #  self.distance <=> other.distance
+    #else
+    #  self.delta_distance <=> other.delta_distance
+    #end
+
+    self.acceleration <=> other.acceleration
   end
 end
 
@@ -72,12 +76,22 @@ input.each_with_index do |row, i|
   particles << Particle.new(i, row)
 end
 
-#particles = particles.sort
 
-1_000.times do
-  particles.each(&:tick)
-  particles = particles.sort
+2000.times do
+  positions = Hash.new { |h, k| h[k] = [] }
+  particles.each_with_index do |p, i|
+    p.tick
+    positions[p.position] = positions[p.position] << p.id
+  end
+
+  positions.each do |k, v|
+    if v.length > 1
+      v.each { |j| particles.delete_if { |p| p.id == j} }
+    end
+  end
+#  particles = particles.sort
 end
 
+#puts particles[0].inspect
 
-puts particles[0].inspect
+puts particles.length
