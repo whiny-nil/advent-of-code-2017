@@ -1,4 +1,5 @@
 input = File.readlines(__dir__ + '/inputs/21.txt')
+#input = File.readlines(__dir__ + '/inputs/21-test.txt')
 
 @patterns = input.map do |row|
   row.strip.split(' => ')
@@ -55,6 +56,7 @@ def replace(grid)
     selection = patterns.select { |p| p[0] == trial_grid }
     return selection[0][1] if selection.length > 0
 
+    trial_grid = flip trial_grid
     trial_grid = rotate trial_grid
   end
 
@@ -87,6 +89,32 @@ def rotate(grid)
   new_grid
 end
 
+def assemble(grids)
+  new_grid = []
+  size = grids[0].length
+
+  amt = Math.sqrt(grids.length).to_i
+  amt.times do
+    row0 = []
+    row1 = []
+    row2 = [] if size >= 3
+    row3 = [] if size == 4
+    amt.times do
+      grid = grids.pop
+      row0 << grid[0]
+      row1 << grid[1]
+      row2 << grid[2] if size >= 3
+      row3 << grid[3] if size == 4
+    end
+    new_grid << row0.flatten
+    new_grid << row1.flatten
+    new_grid << row2.flatten if size >= 3
+    new_grid << row3.flatten if size == 4
+  end
+
+  new_grid
+end
+
 def print(grid)
   grid.length.times do |i|
     puts grid[i].join(' ')
@@ -110,12 +138,11 @@ grid[0] = ['.', '#', '.']
 grid[1] = ['.', '.', '#']
 grid[2] = ['#', '#', '#']
 
-1.times do
+5.times do
   new_grids = segment(grid)
   new_grids = new_grids.map { |grid| replace(grid) }
-  new_grids.each { |g| print g }
-  #grid = assemble(new_grids)
+  grid = assemble(new_grids)
+  print grid
 end
 
-#print grid
 puts count grid
